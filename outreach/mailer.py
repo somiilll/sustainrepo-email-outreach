@@ -31,11 +31,13 @@ def build_message(*, sender_email: str, sender_name: str, to_email: str, subject
     def to_html(text: str) -> str:
         return html.escape(text).replace("\n", "<br>\n")
 
+    site_link = '<a href="https://www.sustainrepo.com">www.sustainrepo.com</a>'
+    sig_html = to_html(SIGNATURE).replace("www.sustainrepo.com", site_link)
     html_body = (
         "<!DOCTYPE html><html><head><meta charset=\"utf-8\"></head>"
         f"<body style=\"{FONT}\">"
         f"<div>{to_html(body)}</div>"
-        f"<div style=\"margin-top:20px\">{to_html(SIGNATURE).replace('www.sustainrepo.com', '<a href=\"https://www.sustainrepo.com\">www.sustainrepo.com</a>')}</div>"
+        f"<div style=\"margin-top:20px\">{sig_html}</div>"
         f"<div style=\"margin-top:24px;font-size:12px;color:#6b7280\">{to_html(OPT_OUT)}</div>"
         "</body></html>"
     )
