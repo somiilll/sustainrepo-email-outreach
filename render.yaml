@@ -1,0 +1,25 @@
+services:
+  - type: cron
+    name: sustainrepo-outreach-sender
+    runtime: python
+    # Every 10 minutes, 09:30-17:29 IST (04:00-11:59 UTC), Monday to Friday.
+    # The sender itself only sends inside the window set on the Settings tab
+    # (currently 10:00-13:00 IST); the other runs just check the inbox.
+    schedule: "*/10 5-11 * * 1-5"
+    buildCommand: pip install -r requirements.txt
+    startCommand: python -m outreach.main
+    envVars:
+      - key: PYTHON_VERSION
+        value: "3.11.9"
+      - key: SHEET_ID
+        value: 1zf7xzrKsmYPhGY702H8T1msu8DUhjRq2UFCSM_xfQmY
+      - key: SENDER_EMAIL
+        value: ruthvikanchuri@sustainrepo.com
+      - key: SENDER_NAME
+        value: Ruthvik Anchuri
+      - key: TIMEZONE
+        value: Asia/Kolkata
+      - key: SMTP_PASSWORD
+        sync: false
+      - key: GOOGLE_SERVICE_ACCOUNT_JSON
+        sync: false

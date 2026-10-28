@@ -1,0 +1,501 @@
+<title>SustainRepo Outreach Desk</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Sora:wght@500;600;700&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+/* Layout: one column operations desk; status strip on top, then tabs: Overview, Review, Activity, Controls. */
+:root{
+  --ink:#10233f; --ink-soft:#3b4d66; --muted:#6a7a8f;
+  --bg:#f4f7f9; --panel:#ffffff; --line:#dbe3ea; --wash:#e9f1ee;
+  --green:#1e7a53; --green-ink:#0f5c3c; --navy:#183a63;
+  --good:#1e7a53; --warn:#a86207; --bad:#b4363a; --info:#2b5d9b;
+  --good-bg:#e3f2ea; --warn-bg:#fbefdc; --bad-bg:#f9e3e3; --info-bg:#e3ecf7;
+  --f-display:"Sora","Segoe UI",system-ui,sans-serif;
+  --f-body:"IBM Plex Sans","Segoe UI",system-ui,sans-serif;
+  --f-mono:"IBM Plex Mono",ui-monospace,Menlo,Consolas,monospace;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --ink:#e6edf5; --ink-soft:#b9c6d6; --muted:#8798ad;
+  --bg:#0d1724; --panel:#132235; --line:#24374f; --wash:#13302a;
+  --green:#4cc08a; --green-ink:#8fe0b8; --navy:#9cc0ea;
+  --good:#4cc08a; --warn:#e2a54a; --bad:#ec7b7e; --info:#82aee6;
+  --good-bg:#14352a; --warn-bg:#3a2b12; --bad-bg:#3d1c1f; --info-bg:#172c47; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --ink:#e6edf5; --ink-soft:#b9c6d6; --muted:#8798ad;
+  --bg:#0d1724; --panel:#132235; --line:#24374f; --wash:#13302a;
+  --green:#4cc08a; --green-ink:#8fe0b8; --navy:#9cc0ea;
+  --good:#4cc08a; --warn:#e2a54a; --bad:#ec7b7e; --info:#82aee6;
+  --good-bg:#14352a; --warn-bg:#3a2b12; --bad-bg:#3d1c1f; --info-bg:#172c47; color-scheme:dark}
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--ink);font-family:var(--f-body);font-size:15px;line-height:1.5}
+.wrap{max-width:980px;margin:0 auto;padding-block:20px 48px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));display:grid;gap:18px}
+header.top{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:12px}
+h1{font-family:var(--f-display);font-size:1.45rem;margin:0;letter-spacing:-.01em;text-wrap:balance}
+h1 small{display:block;font-family:var(--f-body);font-weight:400;font-size:.82rem;color:var(--muted);letter-spacing:0}
+h2{font-family:var(--f-display);font-size:1.05rem;margin:0}
+.btn{font:600 .9rem var(--f-body);border:1px solid var(--line);background:var(--panel);color:var(--ink);border-radius:8px;padding:8px 14px;cursor:pointer;min-height:38px}
+.btn:hover{border-color:var(--ink-soft)}
+.btn:focus-visible,.tab:focus-visible,input:focus-visible,textarea:focus-visible,select:focus-visible{outline:2px solid var(--green);outline-offset:2px}
+.btn.primary{background:var(--green);border-color:var(--green);color:#fff}
+:root[data-theme="dark"] .btn.primary{color:#0d1724}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]) .btn.primary{color:#0d1724}}
+.btn.danger{color:var(--bad);border-color:color-mix(in srgb,var(--bad) 40%,var(--line))}
+.btn[disabled]{opacity:.55;cursor:default}
+.strip{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:10px}
+.stat{background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:12px 14px;display:grid;gap:2px;min-width:0}
+.stat .k{font-size:.72rem;text-transform:uppercase;letter-spacing:.08em;color:var(--muted)}
+.stat .v{font-family:var(--f-display);font-size:1.35rem;font-variant-numeric:tabular-nums}
+.stat .s{font-size:.82rem;color:var(--ink-soft)}
+.meter{height:6px;border-radius:4px;background:var(--line);overflow:hidden;margin-top:6px}
+.meter i{display:block;height:100%;background:var(--green)}
+.pill{display:inline-flex;align-items:center;gap:6px;font-size:.78rem;font-weight:600;border-radius:999px;padding:2px 10px;white-space:nowrap}
+.pill.good{background:var(--good-bg);color:var(--good)} .pill.warn{background:var(--warn-bg);color:var(--warn)}
+.pill.bad{background:var(--bad-bg);color:var(--bad)} .pill.info{background:var(--info-bg);color:var(--info)}
+.pill.muted{background:var(--line);color:var(--ink-soft)}
+nav.tabs{display:flex;gap:4px;border-bottom:1px solid var(--line);overflow-x:auto}
+.tab{font:600 .92rem var(--f-body);background:none;border:0;border-bottom:2px solid transparent;color:var(--muted);padding:10px 12px;cursor:pointer;white-space:nowrap}
+.tab[aria-selected="true"]{color:var(--ink);border-bottom-color:var(--green)}
+.tab .count{font-family:var(--f-mono);font-size:.78rem;margin-left:4px;color:var(--green)}
+section.view{display:grid;gap:14px}
+.panel{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:16px;display:grid;gap:12px;min-width:0}
+.funnel{display:grid;gap:8px}
+.frow{display:grid;grid-template-columns:minmax(120px,1.1fr) 3fr auto;gap:10px;align-items:center;font-size:.9rem}
+.frow .bar{height:12px;border-radius:3px;background:var(--wash);overflow:hidden}
+.frow .bar i{display:block;height:100%;background:var(--navy)}
+.frow .bar i.g{background:var(--green)}
+.frow .n{font-family:var(--f-mono);font-variant-numeric:tabular-nums;min-width:3ch;text-align:right}
+.split{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:14px}
+.card{border:1px solid var(--line);border-radius:10px;padding:14px;display:grid;gap:10px;background:var(--panel);min-width:0}
+.card.approved{border-left:4px solid var(--good)} .card.held{border-left:4px solid var(--warn)}
+.card .head{display:flex;flex-wrap:wrap;gap:8px;align-items:baseline;justify-content:space-between}
+.card .co{font-family:var(--f-display);font-weight:600;font-size:1rem}
+.subject{font-weight:600}
+.body{white-space:pre-wrap;font-size:.9rem;color:var(--ink-soft);background:var(--bg);border-radius:8px;padding:10px 12px;max-height:220px;overflow:auto}
+.who{font-size:.82rem;color:var(--muted)}
+.who b{color:var(--ink-soft);font-weight:500}
+.actions{display:flex;flex-wrap:wrap;gap:8px}
+.filters{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+.filters select{font:inherit;padding:7px 10px;border-radius:8px;border:1px solid var(--line);background:var(--panel);color:var(--ink)}
+textarea,input[type="text"],input[type="number"]{font:inherit;width:100%;border:1px solid var(--line);border-radius:8px;padding:9px 11px;background:var(--panel);color:var(--ink)}
+textarea{min-height:240px;font-size:.9rem;line-height:1.55}
+label.f{display:grid;gap:4px;font-size:.85rem;color:var(--ink-soft)}
+.list{display:grid;gap:0}
+.item{display:grid;grid-template-columns:auto 1fr;gap:10px;padding:10px 0;border-top:1px solid var(--line);align-items:start}
+.item:first-child{border-top:0}
+.item .t{font-family:var(--f-mono);font-size:.78rem;color:var(--muted);white-space:nowrap}
+.item .d{min-width:0;overflow-wrap:anywhere;font-size:.9rem}
+.mono{font-family:var(--f-mono);font-size:.82rem}
+.note{font-size:.85rem;color:var(--ink-soft)}
+.banner{border-radius:10px;padding:12px 14px;font-size:.9rem}
+.banner.bad{background:var(--bad-bg);color:var(--bad)} .banner.warn{background:var(--warn-bg);color:var(--warn)} .banner.info{background:var(--info-bg);color:var(--info)}
+.grid2{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:12px}
+.switch{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:12px 0;border-top:1px solid var(--line)}
+.switch:first-of-type{border-top:0}
+.switch .lbl{display:grid;gap:2px} .switch .lbl span{font-size:.82rem;color:var(--muted)}
+.toast{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(18px + env(safe-area-inset-bottom,0px));background:var(--ink);color:var(--bg);padding:10px 16px;border-radius:8px;font-size:.9rem;z-index:20;max-width:calc(100% - 32px)}
+.empty{padding:20px;text-align:center;color:var(--muted);font-size:.92rem}
+@media (max-width:520px){.frow{grid-template-columns:1fr auto}.frow .bar{grid-column:1/-1;grid-row:2}}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+
+<div class="wrap">
+  <header class="top">
+    <h1>Outreach Desk<small>SustainRepo · tracker sheet, sender and replies in one place</small></h1>
+    <div class="actions">
+      <span id="modePill" class="pill muted">Loading</span>
+      <button class="btn" id="refreshBtn" type="button">Refresh</button>
+    </div>
+  </header>
+
+  <div id="banner" class="banner info" hidden></div>
+
+  <div class="strip" id="strip">
+    <div class="stat"><span class="k">Sent today</span><span class="v" id="sSent">–</span><span class="s" id="sCap">daily cap –</span><div class="meter"><i id="sMeter" style="width:0"></i></div></div>
+    <div class="stat"><span class="k">Ready to send</span><span class="v" id="sReady">–</span><span class="s">approved, checked, not yet sent</span></div>
+    <div class="stat"><span class="k">Waiting for review</span><span class="v" id="sReview">–</span><span class="s">companies with a drafted email</span></div>
+    <div class="stat"><span class="k">Replies</span><span class="v" id="sReplies">–</span><span class="s" id="sBounces">bounces –</span></div>
+  </div>
+
+  <nav class="tabs" role="tablist" aria-label="Sections">
+    <button class="tab" role="tab" id="tab-overview" data-view="overview" aria-selected="true">Overview</button>
+    <button class="tab" role="tab" id="tab-review" data-view="review" aria-selected="false">Review<span class="count" id="reviewCount"></span></button>
+    <button class="tab" role="tab" id="tab-activity" data-view="activity" aria-selected="false">Activity</button>
+    <button class="tab" role="tab" id="tab-controls" data-view="controls" aria-selected="false">Controls</button>
+  </nav>
+
+  <section class="view" id="view-overview">
+    <div class="panel">
+      <h2>Pipeline</h2>
+      <div class="funnel" id="funnel"><div class="empty">Reading the tracker sheet…</div></div>
+      <p class="note" id="lastRun"></p>
+    </div>
+    <div class="split">
+      <div class="panel"><h2>Replies</h2><div class="list" id="replyList"><div class="empty">Replies appear here once people answer.</div></div></div>
+      <div class="panel"><h2>Sources</h2><div class="list" id="sourceList"></div></div>
+    </div>
+  </section>
+
+  <section class="view" id="view-review" hidden>
+    <div class="filters">
+      <select id="reviewFilter" aria-label="Show">
+        <option value="pending">Waiting for review</option>
+        <option value="approved">Approved</option>
+        <option value="held">On hold</option>
+        <option value="all">All drafted</option>
+      </select>
+      <select id="sourceFilter" aria-label="Source">
+        <option value="all">All sources</option>
+        <option value="listed">Listed companies (Apollo, Lusha)</option>
+        <option value="bulk">Bulk list</option>
+      </select>
+      <button class="btn" id="approveAllBtn" type="button">Approve all shown</button>
+    </div>
+    <div class="split" id="reviewList"><div class="empty">Reading drafted emails…</div></div>
+  </section>
+
+  <section class="view" id="view-activity" hidden>
+    <div class="panel"><h2>Recent activity</h2><div class="list" id="activityList"><div class="empty">The sender writes every send, reply and bounce here.</div></div></div>
+  </section>
+
+  <section class="view" id="view-controls" hidden>
+    <div class="panel">
+      <h2>Sending</h2>
+      <div class="switch"><div class="lbl"><b>Sending</b><span>Master switch. Inbox checks keep running when paused.</span></div>
+        <button class="btn" id="toggleSend" type="button">–</button></div>
+      <div class="switch"><div class="lbl"><b>Test mode</b><span>On: the sender only logs what it would send.</span></div>
+        <button class="btn" id="toggleDry" type="button">–</button></div>
+      <div class="grid2">
+        <label class="f" for="capInput">Daily cap<input id="capInput" type="number" min="1" max="60" step="1"></label>
+        <label class="f" for="shareInput">Catch-all share (0 to 1)<input id="shareInput" type="number" min="0" max="1" step="0.05"></label>
+      </div>
+      <div class="actions"><button class="btn primary" id="saveSettings" type="button">Save limits</button></div>
+      <p class="note">Ramp plan: 15 a day for two weeks, then 20 for two weeks, then 30, while bounces stay under 2%.</p>
+    </div>
+    <div class="panel">
+      <h2>Do not email</h2>
+      <div class="grid2">
+        <label class="f" for="dneValue">Email or @domain<input id="dneValue" type="text" placeholder="name@company.com or @company.com" autocomplete="off"></label>
+        <label class="f" for="dneReason">Reason
+          <select id="dneReason"><option>bounced</option><option>opted out</option><option>blocked</option><option>asked not to contact</option><option>other</option></select></label>
+      </div>
+      <div class="actions"><button class="btn" id="addDne" type="button">Add to Do not email</button></div>
+      <div class="list" id="dneList"></div>
+    </div>
+  </section>
+</div>
+<div class="toast" id="toast" hidden></div>
+
+<script>
+const SHEET = "1zf7xzrKsmYPhGY702H8T1msu8DUhjRq2UFCSM_xfQmY";
+const SERVER = "Google Sheets";
+const RANGES = {
+  settings: "Settings!A1:C40", companies: "Companies!A1:J1000", contacts: "Contacts!A1:O3000",
+  bulk: "'Bulk list'!A1:P3000", dne: "'Do not email'!A1:E2000", sentlog: "'Sent log'!A1:B6000",
+  activity: "Activity!A1:E10000"
+};
+const YES = new Set(["yes","y","approved","approve","true","1"]);
+let mcp = null, D = null, busy = false;
+
+const $ = id => document.getElementById(id);
+const c = (r, i) => (r && r[i] != null ? String(r[i]).trim() : "");
+const low = s => s.toLowerCase();
+const todayIST = () => new Date(Date.now() + 330 * 60000).toISOString().slice(0, 10);
+const esc = s => s.replace(/[&<>"]/g, ch => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[ch]));
+const isSent = v => /^\s*(sent|sending)\b/i.test(v);
+const domain = e => (e.split("@")[1] || "").toLowerCase();
+
+function toast(msg) { const t = $("toast"); t.textContent = msg; t.hidden = false; clearTimeout(toast.h); toast.h = setTimeout(() => t.hidden = true, 3200); }
+function banner(msg, kind = "info") { const b = $("banner"); if (!msg) { b.hidden = true; return; } b.className = "banner " + kind; b.textContent = msg; b.hidden = false; }
+
+function explain(err) {
+  const code = err && err.code;
+  if (code === "needs_reauth") return "Google Sheets needs reconnecting. Reconnect it in claude.ai Settings, Connectors, then press Refresh.";
+  if (code === "server_not_connected") return "Google Sheets is not connected for you. Add it in claude.ai Settings, Connectors, then press Refresh.";
+  if (code === "not_in_manifest" || code === "approval_required") return "This page needs your permission to use Google Sheets. Press Refresh and choose Allow.";
+  if (code === "selection_required") return "You have more than one Google Sheets connection. Choose one when claude.ai asks, then press Refresh.";
+  if (code === "server_unavailable") return "Google Sheets did not answer in time. Press Refresh in a moment.";
+  if (code === "tool_error") return "Google Sheets refused the request: " + (err.message || "unknown reason");
+  return "Could not reach the tracker sheet (" + (code || "error") + "). Press Refresh to try again.";
+}
+
+async function getValues(range) {
+  const r = await mcp.callTool(SERVER, "get_values", { spreadsheetId: SHEET, range }, { cache: false });
+  const p = r.payload || {};
+  return Array.isArray(p.values) ? p.values : [];
+}
+async function setValues(range, values) {
+  await mcp.callTool(SERVER, "update_values", { spreadsheetId: SHEET, range, values }, { cache: false });
+}
+
+async function load() {
+  if (!mcp || busy) return;
+  busy = true; $("refreshBtn").disabled = true; $("refreshBtn").textContent = "Refreshing…";
+  try {
+    const keys = Object.keys(RANGES);
+    const vals = await Promise.all(keys.map(k => getValues(RANGES[k])));
+    D = Object.fromEntries(keys.map((k, i) => [k, vals[i]]));
+    banner(null); render();
+  } catch (e) { banner(explain(e), e && e.code === "server_unavailable" ? "warn" : "bad"); }
+  finally { busy = false; $("refreshBtn").disabled = false; $("refreshBtn").textContent = "Refresh"; }
+}
+
+/* ── derive state from the sheet ─────────────────────────────────────── */
+function settings() {
+  const s = {}; (D.settings || []).slice(1).forEach((r, i) => { if (c(r,0)) s[low(c(r,0))] = { v: c(r,1), row: i + 2 }; }); return s;
+}
+function blocked() {
+  const emails = new Set(), domains = new Set();
+  (D.dne || []).slice(1).forEach(r => { const v = low(c(r,0)); if (!v) return; if (v.startsWith("@")) domains.add(v.slice(1)); else if (v.includes("@")) emails.add(v); else domains.add(v); });
+  return { emails, domains };
+}
+function model() {
+  const today = todayIST(), blk = blocked();
+  const sentLog = new Set((D.sentlog || []).slice(1).map(r => low(c(r,0))).filter(Boolean));
+  const companies = (D.companies || []).slice(1).map((r, i) => ({ row: i + 2, rank: c(r,0), name: c(r,1), research: c(r,6), subject: c(r,7), body: c(r,8), approved: low(c(r,9)) }));
+  const byRank = Object.fromEntries(companies.map(x => [x.rank, x]));
+  const contacts = (D.contacts || []).slice(1).map((r, i) => ({ row: i + 2, rank: c(r,1), company: c(r,2), name: c(r,4), title: c(r,5), tier: c(r,6), email: c(r,7), status: low(c(r,8)), sent: c(r,10), replied: c(r,11), id: c(r,12) }));
+  const bulk = (D.bulk || []).slice(1).map((r, i) => ({ row: i + 2, company: c(r,0), name: c(r,1), email: c(r,2), title: c(r,3), listed: c(r,7), research: c(r,8), subject: c(r,9), body: c(r,10), sent: c(r,12), replied: c(r,13), check: low(c(r,14)), approved: low(c(r,15)) }));
+
+  const isBlocked = e => blk.emails.has(low(e)) || blk.domains.has(domain(e));
+  const okStatus = s => s === "valid" || s === "catchall";
+  const sendable = x => x.email && !x.sent && !x.replied && !isBlocked(x.email) && !sentLog.has(low(x.email));
+
+  const groups = [];
+  const listedByRank = {};
+  contacts.forEach(x => { (listedByRank[x.rank] = listedByRank[x.rank] || []).push(x); });
+  Object.entries(listedByRank).forEach(([rank, people]) => {
+    const co = byRank[rank]; if (!co || !co.subject || !co.body) return;
+    const ready = people.filter(p => sendable(p) && okStatus(p.status));
+    const sent = people.filter(p => isSent(p.sent));
+    if (!ready.length && !sent.length) return;
+    groups.push({ kind: "listed", key: "c" + co.row, name: co.name || people[0].company, subject: co.subject, body: co.body,
+      research: co.research, state: YES.has(co.approved) ? "approved" : co.approved === "hold" ? "held" : "pending",
+      ready, sent, people, coRow: co.row, source: people.some(p => p.id.startsWith("lusha-")) ? "Lusha" : "Apollo" });
+  });
+  const bulkBy = {};
+  bulk.forEach(x => { if (!x.email) return; const k = low(x.company) || domain(x.email); (bulkBy[k] = bulkBy[k] || []).push(x); });
+  Object.values(bulkBy).forEach(rows => {
+    const drafted = rows.filter(r => r.subject && r.body);
+    if (!drafted.length) return;
+    const ready = drafted.filter(r => sendable(r) && (r.check === "valid" || r.check.startsWith("catch")));
+    const sent = rows.filter(r => isSent(r.sent));
+    if (!ready.length && !sent.length) return;
+    const first = drafted[0];
+    const st = drafted.every(r => YES.has(r.approved)) ? "approved" : drafted.some(r => r.approved === "hold") ? "held" : "pending";
+    groups.push({ kind: "bulk", key: "b" + first.row, name: first.company || domain(first.email), subject: first.subject, body: first.body,
+      research: first.research, listed: first.listed, state: st, ready, sent, people: rows, bulkRows: drafted, source: "Bulk list" });
+  });
+
+  const sentToday = contacts.filter(x => isSent(x.sent) && x.sent.includes(today)).length + bulk.filter(x => isSent(x.sent) && x.sent.includes(today)).length;
+  const replies = [...contacts.filter(x => x.replied).map(x => ({ ...x, src: "Listed" })), ...bulk.filter(x => x.replied).map(x => ({ ...x, src: "Bulk list" }))];
+  const bounces = (D.dne || []).slice(1).filter(r => low(c(r,1)).startsWith("bounce")).length;
+  const readyCount = groups.filter(g => g.state === "approved").reduce((n, g) => n + g.ready.length, 0);
+
+  const withEmail = contacts.filter(x => x.email);
+  const checked = withEmail.filter(x => ["valid","catchall","invalid","unknown","do not email","already emailed"].includes(x.status));
+  const bulkEmail = bulk.filter(x => x.email);
+  const funnel = [
+    ["People found", withEmail.length + bulkEmail.length, false],
+    ["Address checked", checked.length + bulkEmail.filter(x => x.check).length, false],
+    ["Deliverable", withEmail.filter(x => okStatus(x.status)).length + bulkEmail.filter(x => x.check === "valid" || x.check.startsWith("catch")).length, false],
+    ["Email drafted", groups.reduce((n, g) => n + g.ready.length + g.sent.length, 0), false],
+    ["Approved, waiting", readyCount, true],
+    ["Sent", contacts.filter(x => isSent(x.sent)).length + bulk.filter(x => isSent(x.sent)).length, true],
+    ["Replied", replies.length, true],
+  ];
+  const sources = [
+    ["Apollo", contacts.filter(x => x.email && !x.id.startsWith("lusha-")).length],
+    ["Lusha", contacts.filter(x => x.email && x.id.startsWith("lusha-")).length],
+    ["Bulk list", bulkEmail.length],
+    ["Do not email", (D.dne || []).length - 1 > 0 ? (D.dne.length - 1) : 0],
+    ["Sent log (all-time recipients)", sentLog.size],
+  ];
+  return { groups, sentToday, replies, bounces, readyCount, funnel, sources };
+}
+
+/* ── render ───────────────────────────────────────────────────────────── */
+function render() {
+  const s = settings(), M = model();
+  const on = YES.has(low(s.sending_enabled?.v || "no")), dry = !["no","n","false","0"].includes(low(s.dry_run?.v || "yes"));
+  const cap = parseInt(s.daily_cap?.v || "15", 10) || 15;
+  const pill = $("modePill");
+  if (!on) { pill.className = "pill muted"; pill.textContent = "Paused"; }
+  else if (dry) { pill.className = "pill warn"; pill.textContent = "Test mode"; }
+  else { pill.className = "pill good"; pill.textContent = "Sending live"; }
+
+  $("sSent").textContent = M.sentToday; $("sCap").textContent = "daily cap " + cap;
+  $("sMeter").style.width = Math.min(100, Math.round(M.sentToday / cap * 100)) + "%";
+  $("sReady").textContent = M.readyCount;
+  const pending = M.groups.filter(g => g.state === "pending").length;
+  $("sReview").textContent = pending; $("reviewCount").textContent = pending ? pending : "";
+  $("sReplies").textContent = M.replies.length; $("sBounces").textContent = "bounces " + M.bounces;
+
+  const max = Math.max(1, ...M.funnel.map(f => f[1]));
+  $("funnel").innerHTML = M.funnel.map(([label, n, g]) =>
+    `<div class="frow"><span>${esc(label)}</span><span class="bar"><i class="${g ? "g" : ""}" style="width:${Math.max(n ? 2 : 0, Math.round(n / max * 100))}%"></i></span><span class="n">${n}</span></div>`).join("");
+  $("lastRun").textContent = s.last_run?.v ? "Sender, last run: " + s.last_run.v : "The sender has not run yet.";
+
+  $("replyList").innerHTML = M.replies.length ? M.replies.slice(-12).reverse().map(r =>
+    `<div class="item"><span class="pill good">Replied</span><div class="d"><b>${esc(r.name || r.email)}</b> · ${esc(r.company || "")}<br><span class="mono">${esc(r.email)}</span> <span class="who">${esc(r.replied)}</span></div></div>`).join("")
+    : `<div class="empty">No replies yet.</div>`;
+  $("sourceList").innerHTML = M.sources.map(([k, n]) => `<div class="item"><span class="mono">${String(n).padStart(4, " ")}</span><div class="d">${esc(k)}</div></div>`).join("");
+
+  renderReview(M); renderActivity(); renderControls(s, on, dry, cap);
+}
+
+function personLine(p) {
+  const st = p.status || p.check || "";
+  const cls = /^valid/.test(st) ? "good" : /^catch/.test(st) ? "warn" : "muted";
+  return `<span class="pill ${cls}">${esc(st || "unchecked")}</span> <b>${esc(p.name || "")}</b>${p.title ? ", " + esc(p.title) : ""}`;
+}
+
+function renderReview(M) {
+  const f = $("reviewFilter").value, src = $("sourceFilter").value;
+  const shown = M.groups.filter(g => (f === "all" || g.state === f) && (src === "all" || (src === "bulk" ? g.kind === "bulk" : g.kind === "listed")));
+  $("approveAllBtn").hidden = f !== "pending" || !shown.length;
+  if (!shown.length) { $("reviewList").innerHTML = `<div class="empty">${f === "pending" ? "Nothing waiting for review. New drafts arrive after each morning run." : "No companies here yet."}</div>`; return; }
+  $("reviewList").innerHTML = shown.map(g => `
+    <article class="card ${g.state}" data-key="${g.key}">
+      <div class="head"><span class="co">${esc(g.name)}</span>
+        <span class="pill ${g.state === "approved" ? "good" : g.state === "held" ? "warn" : "info"}">${g.state === "pending" ? "Waiting for review" : g.state === "approved" ? "Approved" : "On hold"}</span></div>
+      <div class="who">${esc(g.source)}${g.listed ? " · " + esc(g.listed) : ""} · ${g.ready.length} ready${g.sent.length ? ", " + g.sent.length + " sent" : ""}</div>
+      <div class="subject">${esc(g.subject)}</div>
+      <div class="body">${esc(g.body)}</div>
+      <div class="who">${g.ready.slice(0, 6).map(personLine).join("<br>")}${g.ready.length > 6 ? "<br>and " + (g.ready.length - 6) + " more" : ""}</div>
+      ${g.research ? `<details><summary class="who">Research and sources</summary><p class="note" style="overflow-wrap:anywhere">${esc(g.research)}</p></details>` : ""}
+      <div class="actions">
+        ${g.state !== "approved" ? `<button class="btn primary" data-act="approve" type="button">Approve</button>` : ""}
+        ${g.state !== "held" ? `<button class="btn" data-act="hold" type="button">Hold</button>` : ""}
+        <button class="btn" data-act="edit" type="button">Edit</button>
+      </div>
+    </article>`).join("");
+}
+
+function renderActivity() {
+  const rows = (D.activity || []).slice(1).filter(r => c(r,0)).slice(-60).reverse();
+  const cls = t => ({ sent: "good", reply: "good", failed: "bad", bounce: "bad", "opt-out": "warn", "dry-run": "info" }[t] || "muted");
+  $("activityList").innerHTML = rows.length ? rows.map(r =>
+    `<div class="item"><span class="t">${esc(c(r,0))}</span><div class="d"><span class="pill ${cls(low(c(r,1)))}">${esc(c(r,1))}</span> <span class="mono">${esc(c(r,2))}</span>${c(r,3) ? " · " + esc(c(r,3)) : ""}<br><span class="note">${esc(c(r,4))}</span></div></div>`).join("")
+    : `<div class="empty">Nothing yet. The sender writes every send, reply and bounce here.</div>`;
+}
+
+function renderControls(s, on, dry, cap) {
+  $("toggleSend").textContent = on ? "Pause sending" : "Start sending";
+  $("toggleSend").className = on ? "btn danger" : "btn primary";
+  $("toggleDry").textContent = dry ? "Turn test mode off" : "Turn test mode on";
+  if (document.activeElement !== $("capInput")) $("capInput").value = cap;
+  if (document.activeElement !== $("shareInput")) $("shareInput").value = s.catchall_share?.v || "0.33";
+  const rows = (D.dne || []).slice(1).filter(r => c(r,0)).slice(-15).reverse();
+  $("dneList").innerHTML = rows.length ? rows.map(r => `<div class="item"><span class="pill ${low(c(r,1)).startsWith("bounce") ? "bad" : "warn"}">${esc(c(r,1) || "blocked")}</span><div class="d mono">${esc(c(r,0))} <span class="who">${esc(c(r,2))}</span></div></div>`).join("")
+    : `<div class="empty">Nobody on the list yet.</div>`;
+}
+
+/* ── actions ──────────────────────────────────────────────────────────── */
+async function act(label, fn) {
+  if (busy) return; busy = true;
+  try { await fn(); toast(label); } catch (e) { banner(explain(e), "bad"); }
+  finally { busy = false; await load(); }
+}
+
+function groupByKey(key) { return model().groups.find(g => g.key === key); }
+
+async function setApproval(g, value) {
+  if (g.kind === "listed") await setValues(`Companies!J${g.coRow}`, [[value]]);
+  else for (const r of g.bulkRows) await setValues(`'Bulk list'!P${r.row}`, [[value]]);
+}
+
+function openEditor(card, g) {
+  card.innerHTML = `
+    <div class="head"><span class="co">${esc(g.name)}</span><span class="pill info">Editing</span></div>
+    <label class="f" for="ed-s-${g.key}">Subject<input type="text" id="ed-s-${g.key}" value="${esc(g.subject)}"></label>
+    <label class="f" for="ed-b-${g.key}">Email${g.kind === "listed" ? " ({first} becomes each person's first name)" : ""}<textarea id="ed-b-${g.key}">${esc(g.body)}</textarea></label>
+    <div class="actions"><button class="btn primary" data-act="save" type="button">Save email</button><button class="btn" data-act="cancel" type="button">Cancel</button></div>`;
+}
+
+async function saveEdit(card, g) {
+  const subj = $("ed-s-" + g.key).value.trim(), body = $("ed-b-" + g.key).value.trim();
+  if (!subj || !body) { banner("Subject and email cannot be empty.", "warn"); return; }
+  await act("Email saved", async () => {
+    if (g.kind === "listed") await setValues(`Companies!H${g.coRow}:I${g.coRow}`, [[subj, body]]);
+    else for (const r of g.bulkRows) {
+      const first = (r.name || "").split(" ")[0];
+      const greet = first && !/^[A-Z]{1,3}\.?$/.test(first) ? first : "there";
+      await setValues(`'Bulk list'!J${r.row}:K${r.row}`, [[subj, body.replace(/^Hi [^,\n]*,/, "Hi " + greet + ",")]]);
+    }
+  });
+}
+
+$("reviewList").addEventListener("click", e => {
+  const btn = e.target.closest("button[data-act]"); if (!btn) return;
+  const card = btn.closest("article"), g = groupByKey(card.dataset.key); if (!g) return;
+  const a = btn.dataset.act;
+  if (a === "approve") act(`${g.name} approved`, () => setApproval(g, "Yes"));
+  else if (a === "hold") act(`${g.name} on hold`, () => setApproval(g, "Hold"));
+  else if (a === "edit") openEditor(card, g);
+  else if (a === "cancel") render();
+  else if (a === "save") saveEdit(card, g);
+});
+
+let approveAllArmed = false;
+$("approveAllBtn").addEventListener("click", () => {
+  const f = $("reviewFilter").value, src = $("sourceFilter").value;
+  const shown = model().groups.filter(g => g.state === "pending" && (src === "all" || (src === "bulk" ? g.kind === "bulk" : g.kind === "listed")));
+  if (!approveAllArmed) { approveAllArmed = true; $("approveAllBtn").textContent = `Confirm: approve ${shown.length}`; setTimeout(() => { approveAllArmed = false; $("approveAllBtn").textContent = "Approve all shown"; }, 5000); return; }
+  approveAllArmed = false; $("approveAllBtn").textContent = "Approve all shown";
+  act(`${shown.length} companies approved`, async () => { for (const g of shown) await setApproval(g, "Yes"); });
+});
+$("reviewFilter").addEventListener("change", () => D && renderReview(model()));
+$("sourceFilter").addEventListener("change", () => D && renderReview(model()));
+
+async function setSetting(key, value) {
+  const s = settings(); if (!s[key]) throw { code: "tool_error", message: `Setting "${key}" is missing from the Settings tab.` };
+  await setValues(`Settings!B${s[key].row}`, [[value]]);
+}
+let sendArmed = false;
+$("toggleSend").addEventListener("click", () => {
+  const s = settings(), on = YES.has(low(s.sending_enabled?.v || "no"));
+  if (!on && !sendArmed) { sendArmed = true; $("toggleSend").textContent = "Confirm: start sending"; setTimeout(() => { sendArmed = false; D && render(); }, 5000); return; }
+  sendArmed = false;
+  act(on ? "Sending paused" : "Sending started", () => setSetting("sending_enabled", on ? "no" : "yes"));
+});
+let dryArmed = false;
+$("toggleDry").addEventListener("click", () => {
+  const s = settings(), dry = !["no","n","false","0"].includes(low(s.dry_run?.v || "yes"));
+  if (dry && !dryArmed) { dryArmed = true; $("toggleDry").textContent = "Confirm: send real emails"; setTimeout(() => { dryArmed = false; D && render(); }, 5000); return; }
+  dryArmed = false;
+  act(dry ? "Test mode off: real emails will send" : "Test mode on", () => setSetting("dry_run", dry ? "no" : "yes"));
+});
+$("saveSettings").addEventListener("click", () => {
+  const cap = parseInt($("capInput").value, 10), share = parseFloat($("shareInput").value);
+  if (!(cap >= 1 && cap <= 60)) { banner("Daily cap must be between 1 and 60.", "warn"); return; }
+  if (!(share >= 0 && share <= 1)) { banner("Catch-all share must be between 0 and 1.", "warn"); return; }
+  act("Limits saved", async () => { await setSetting("daily_cap", String(cap)); await setSetting("catchall_share", String(share)); });
+});
+$("addDne").addEventListener("click", () => {
+  const v = $("dneValue").value.trim().toLowerCase(), reason = $("dneReason").value;
+  if (!/^(@?[a-z0-9.\-]+\.[a-z]{2,}|[^\s@]+@[a-z0-9.\-]+\.[a-z]{2,})$/.test(v)) { banner("Enter an email address or a domain such as @company.com.", "warn"); return; }
+  const next = (D.dne || []).length + 1;
+  act(`${v} added to Do not email`, async () => {
+    await setValues(`'Do not email'!A${next}:E${next}`, [[v, reason, todayIST(), "", "you (dashboard)"]]);
+    $("dneValue").value = "";
+  });
+});
+
+/* ── tabs (hash-routed) ───────────────────────────────────────────────── */
+const VIEWS = ["overview", "review", "activity", "controls"];
+function show(view) {
+  if (!VIEWS.includes(view)) view = "overview";
+  VIEWS.forEach(v => { $("view-" + v).hidden = v !== view; $("tab-" + v).setAttribute("aria-selected", String(v === view)); });
+}
+document.querySelectorAll(".tab").forEach(t => t.addEventListener("click", () => { location.hash = t.dataset.view; show(t.dataset.view); }));
+window.addEventListener("hashchange", () => show(location.hash.slice(1)));
+show(location.hash.slice(1));
+$("refreshBtn").addEventListener("click", load);
+
+(async () => {
+  mcp = window.claude ? await window.claude.use("mcp") : null;
+  if (!mcp) { banner("Open this page on claude.ai to connect it to the tracker sheet.", "warn"); $("modePill").textContent = "Offline"; return; }
+  load();
+})();
+</script>
