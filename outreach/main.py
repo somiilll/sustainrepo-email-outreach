@@ -37,10 +37,18 @@ def setting(rows: list[list[str]], name: str) -> str:
     return ""
 
 
-def contacted_addresses(data: dict) -> set[str]:
-    out = {rules.norm_email(rules.cell(r, 0)) for r in data["sent_log"][1:] if rules.cell(r, 0)}
-    out |= {rules.norm_email(rules.cell(r, 7)) for r in data["contacts"][1:] if rules.SENT_RE.match(rules.cell(r, 10))}
+def outreach_addresses(data: dict) -> set[str]:
+    """People we cold-emailed: Contacts and Bulk list rows marked sent. Only their mail is ever opened."""
+    out = {rules.norm_email(rules.cell(r, 7)) for r in data["contacts"][1:] if rules.SENT_RE.match(rules.cell(r, 10))}
     out |= {rules.norm_email(rules.cell(r, 2)) for r in data["bulk"][1:] if rules.SENT_RE.match(rules.cell(r, 12))}
+    out.discard("")
+    return out
+
+
+def contacted_addresses(data: dict) -> set[str]:
+    """Everyone ever emailed (Sent log plus outreach). Used only to match bounce notices."""
+    out = {rules.norm_email(rules.cell(r, 0)) for r in data["sent_log"][1:] if rules.cell(r, 0)}
+    out |= outreach_addresses(data)
     out.discard("")
     return out
 
@@ -73,9 +81,9 @@ def sync_mailbox(sheet: Sheet, cfg, data: dict, now: datetime, log: list[str]) -
 
     # Inbox -> replies, bounces, opt-outs.
     inbox_uid = setting(settings_rows, "inbox_last_uid")
-    contacted = contacted_addresses(data)
     events, newest_in = inbox.read_inbox(cfg.imap_host, cfg.sender_email, cfg.sender_password,
-                                         int(inbox_uid) if inbox_uid.isdigit() else None, contacted)
+                                         int(inbox_uid) if inbox_uid.isdigit() else None,
+                                         outreach_addresses(data), bounce_list=contacted_addresses(data))
     blocked = {rules.cell(r, 0).lower() for r in data["do_not_email"][1:]}
     activity, dne = [], []
     for ev in events:
