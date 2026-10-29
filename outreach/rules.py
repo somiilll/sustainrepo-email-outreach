@@ -95,6 +95,39 @@ class Context:
     last_send_today: datetime | None = None
     last_send_was_catchall: bool = False
 
+    def record_send(self, email: str, when: datetime, status: str, today: date) -> None:
+        """Count one send (real, or simulated in test mode) towards today's limits."""
+        self.company_sends.setdefault(company_key(email), []).append(when)
+        self.sent_log.setdefault(email, when)
+        if when.date() == today:
+            self.sent_today += 1
+            catch = "catch" in status
+            if catch:
+                self.catchall_sent_today += 1
+            if self.last_send_today is None or when >= self.last_send_today:
+                self.last_send_today = when
+                self.last_send_was_catchall = catch
+
+
+DRY_STATUS_RE = re.compile(r"\((valid|catchall|catch-all)[,)]", re.I)
+
+
+def add_dry_runs(ctx: Context, activity: list[list], today: date) -> int:
+    """Test mode: treat today's dry-run entries as sends, so the simulation follows the same
+    cap, per-company and no-repeat rules as real sending."""
+    n = 0
+    for r in activity[1:]:
+        if cell(r, 1).lower() != "dry-run":
+            continue
+        when = parse_when(cell(r, 0))
+        email = norm_email(cell(r, 2))
+        if not when or not email or when.date() != today:
+            continue
+        m = DRY_STATUS_RE.search(cell(r, 4))
+        ctx.record_send(email, when, m.group(1).lower() if m else "valid", today)
+        n += 1
+    return n
+
 
 @dataclass
 class Settings:
@@ -157,16 +190,7 @@ def build_context(contacts: list[list], bulk: list[list], do_not_email: list[lis
 
     def note_send(email: str, sent_cell: str, status: str):
         when = parse_when(sent_cell) or datetime.combine(today, datetime.min.time())
-        ctx.company_sends.setdefault(company_key(email), []).append(when)
-        ctx.sent_log.setdefault(email, when)
-        if when.date() == today:
-            ctx.sent_today += 1
-            catch = "catch" in status
-            if catch:
-                ctx.catchall_sent_today += 1
-            if ctx.last_send_today is None or when >= ctx.last_send_today:
-                ctx.last_send_today = when
-                ctx.last_send_was_catchall = catch
+        ctx.record_send(email, when, status, today)
 
     # Contacts: H=7 email, I=8 status, K=10 sent, L=11 replied
     for r in contacts[1:]:

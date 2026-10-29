@@ -120,6 +120,8 @@ def send_one(sheet: Sheet, cfg, data: dict, settings: rules.Settings, now: datet
     if not settings.sending_enabled:
         log.append("sending paused (sending_enabled = no)")
         return
+    if settings.dry_run:
+        rules.add_dry_runs(ctx, data.get("activity", []), now.date())
     go, why = rules.should_send_now(now, settings, ctx)
     if not go:
         log.append(f"no send: {why}")
